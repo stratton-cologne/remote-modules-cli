@@ -1,0 +1,32 @@
+{
+    "name": "@stratton-cologne/remote-modules-cli",
+    "version": "1.0.0",
+    "description": "CLI zum Generieren & Veröffentlichen von /public/modules/index.json für @stratton-cologne/remote-modules",
+    "license": "MIT",
+    "type": "module",
+    "bin": {
+        "srm": "dist/cli.js"
+    },
+    "engines": {
+        "node": ">=18"
+    },
+    "exports": {
+        ".": {
+            "types": "./dist/cli.d.ts",
+            "import": "./dist/cli.js"
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "tsup src/cli.ts --dts --format esm --clean",
+        "dev": "tsup src/cli.ts --watch --dts --format esm",
+        "typecheck": "tsc --noEmit"
+    },
+    "devDependencies": {
+        "tsup": "^8.5.0",
+        "typescript": "^5.9.2",
+        "@types/node": "^24.3.0"
+    }
+}
