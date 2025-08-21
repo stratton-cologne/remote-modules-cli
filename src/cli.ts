@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-import { resolve } from "node:path";
+import { resolve, join } from "node:path";
 import { generateIndex } from "./generate.js";
 import { publish } from "./publish.js";
+import { scaffoldModule } from "./scaffold.js";
 
 function parseArgs(argv: string[]) {
     const args = {
@@ -30,21 +31,33 @@ function help() {
 Usage: srm <command> [options]
 
 Commands:
-  generate   Scannt /public/modules und erzeugt index.json (plus optional Dev/Spec)
-  publish    Spiegelt installierte Pakete mit remoteModule-Metadaten nach /public/modules und aktualisiert index.json
+  generate          Scannt /public/modules und erzeugt index.json (plus optional Dev/Spec)
+  publish           Spiegelt installierte Pakete mit remoteModule-Metadaten und aktualisiert index.json
+  scaffold [name]   Erstellt ein Modul-Grundgerüst (in-host oder als eigenes Package)
 
-Options (global):
-  --host <path>           Wurzel des Host-Projekts (default: .)
-  --modules-dir <path>    Ordner für Module relativ zu --host (default: public/modules)
+Global Options:
+  --host <path>              Wurzel des Host-Projekts (default: .)
+  --modules-dir <path>       Ordner für Module relativ zu --host (default: public/modules)
 
-Options generate:
-  --dev name=entryDev     Dev-Eintrag hinzufügen (kann mehrfach)
-  --spec name=specifier   Spec/CDN-Eintrag hinzufügen (kann mehrfach)
-  --dry                   Nur ausgeben, nicht schreiben
+generate Options:
+  --dev name=entryDev        Dev-Eintrag hinzufügen (kann mehrfach)
+  --spec name=specifier      Spec/CDN-Eintrag hinzufügen (kann mehrfach)
+  --dry                      Nur ausgeben, nicht schreiben
 
-Options publish:
-  --packages <list>       Kommagetrennte Liste von Paketnamen
-  --all                   Alle Pakete in node_modules prüfen (langsamer)
+publish Options:
+  --packages <list>          Kommagetrennte Liste von Paketnamen
+  --all                      Alle Pakete in node_modules prüfen (langsamer)
+
+scaffold Options:
+  --name <modulname>         Name, falls nicht als Positional angegeben
+  --as-package               Als eigenständiges npm-Package scaffolden
+  --target <dir>             Zielpfad (default: src/modules/<name> bzw. modules/<name>)
+  --route </pfad>            Basisroute (default: /<name>)
+  --namespace <ns>           i18n Namespace (default: <name>)
+  --title <Titel>            Titel im Layout (default: PascalCase(Name))
+  --pkg-name <name>          package.json name (nur mit --as-package)
+  --manifest                 /public/modules/index.json nach Scaffold aktualisieren (Dev-Entry)
+  --force                    Vorhandene Dateien überschreiben
 `);
 }
 
@@ -64,7 +77,6 @@ async function main() {
     if (cmd === "generate") {
         const devEntries: Record<string, string> = {};
         const specs: Record<string, string> = {};
-
         for (const [k, v] of flags.entries()) {
             if (k === "dev") {
                 const [name, entryDev] = String(v).split("=");
@@ -74,7 +86,6 @@ async function main() {
                 if (name && spec) specs[name] = spec;
             }
         }
-
         const write = !flags.has("dry");
         const { refs, indexFile } = await generateIndex({
             hostDir,
@@ -102,6 +113,31 @@ async function main() {
             all,
         });
         console.log(JSON.stringify({ published }, null, 2));
+        return;
+    }
+
+    if (cmd === "scaffold") {
+        const name = (_[1] as string) || (flags.get("name") as string);
+        if (!name) {
+            console.error(
+                "Fehlender Modulname. Nutze: srm scaffold <name> [--as-package] [...]"
+            );
+            process.exit(1);
+        }
+        const res = await scaffoldModule({
+            hostDir,
+            name,
+            target: flags.get("target") as string | undefined,
+            asPackage: !!flags.get("as-package"),
+            route: flags.get("route") as string | undefined,
+            namespace: flags.get("namespace") as string | undefined,
+            title: flags.get("title") as string | undefined,
+            pkgName: flags.get("pkg-name") as string | undefined,
+            manifest: !!flags.get("manifest"),
+            modulesDir,
+            force: !!flags.get("force"),
+        });
+        console.log(JSON.stringify(res, null, 2));
         return;
     }
 

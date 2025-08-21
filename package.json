@@ -1,6 +1,6 @@
 {
     "name": "@stratton-cologne/remote-modules-cli",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "CLI zum Generieren & Veröffentlichen von /public/modules/index.json für @stratton-cologne/remote-modules",
     "license": "MIT",
     "type": "module",
