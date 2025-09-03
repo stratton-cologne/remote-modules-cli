@@ -1,9 +1,12 @@
 # @stratton-cologne/remote-modules-cli
 
 [![npm version](https://img.shields.io/npm/v/@stratton-cologne/remote-modules-cli.svg)](https://www.npmjs.com/package/@stratton-cologne/remote-modules-cli)
+[![npm downloads (total)](https://img.shields.io/npm/dt/%40stratton-cologne%2Fremote-modules-cli)](https://www.npmjs.com/package/@stratton-cologne/remote-modules-cli)
+[![npm downloads (week)](https://img.shields.io/npm/dw/%40stratton-cologne%2Fremote-modules-cli)](https://www.npmjs.com/package/@stratton-cologne/remote-modules-cli)
 ![node >= 18](https://img.shields.io/badge/node-%3E%3D18-brightgreen)
 ![typescript](https://img.shields.io/badge/TypeScript-ready-blue)
 ![license: MIT](https://img.shields.io/badge/license-MIT-lightgrey)
+
 
 CLI zum **Generieren**, **Veröffentlichen** _und_ **Scaffolden** von Remote‑Modulen/Manifesten (`/public/modules/index.json`) – kompatibel zu `@stratton-cologne/remote-modules`.
 
